@@ -1,249 +1,237 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
-void main() => runApp(MyApp());
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
+import 'package:flutter/services.dart';
 
-class table extends StatefulWidget {
-  const table({ Key key }) : super(key: key);
 
-  @override
-  _Table createState() => _Table();
+
+import 'dart:async';
+import 'dart:convert';
+var apiKey = "AIzaSyAAFXiekUVvfsAe1miEFxau1t-XG1oL5yg";
+Map<String, double> _currentLocation;
+
+Future<Position> position =  Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+void main() {
+
+
+  runApp(MaterialApp(
+
+    home: HomePage(),
+
+  ));
+
 }
 
+class MapsDemo extends StatelessWidget {
+  MapsDemo(this.mapWidget, this.controller);
 
-class _Table extends State<table>{
+  final Widget mapWidget;
+  final GoogleMapController controller;
 
-  Widget bodyData() => DataTable(
-      onSelectAll: (b) {},
-      sortColumnIndex: 1,
-      sortAscending: true,
-      columns: <DataColumn>[
-        DataColumn(
-          label: Text("First Name"),
-          numeric: false,
-          tooltip: "To display first name of the Name",
-        ),
-        DataColumn(
-          label: Text("Last Name"),
-          numeric: false,
-          tooltip: "To display last name of the Name",
-        ),
-      ],
-      rows: names
-          .map(
-            (name) => DataRow(
-          cells: [
-            DataCell(
-              Text(name.firstName),
-              showEditIcon: false,
-              placeholder: false,
-            ),
-            DataCell(
-              Text(name.lastName),
-              showEditIcon: false,
-              placeholder: false,
-            )
-          ],
-        ),
-      )
-          .toList());
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Episode 5 - Data Table"),
-      ),
-      body: Container(
-        child: bodyData(),
+
+
+    return Padding(
+      padding: EdgeInsets.all(15.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          Center(child: mapWidget),
+          RaisedButton(
+            child: const Text('Update Current Location'),
+            onPressed: () {
+
+
+
+              controller.animateCamera(CameraUpdate.newCameraPosition(
+                 CameraPosition(
+                  bearing: 270.0,
+                  target: LatLng(_currentLocation["latitude"], _currentLocation["longitude"]),
+                  tilt: 30.0,
+                  zoom: 17.0,
+                ),
+              ));
+            },
+          ),
+        ],
       ),
     );
   }
 }
 
+final GoogleMapOverlayController controller =
+GoogleMapOverlayController.fromSize(width: 300.0, height: 200.0);
+final Widget mapWidget = GoogleMapOverlay(controller: controller);
 
-class Name {
-  String firstName;
-  String lastName;
 
-  Name({this.firstName, this.lastName});
-}
-
-var names = <Name>[
-  Name(firstName: "Pawan", lastName: "Kumar"),
-  Name(firstName: "Aakash", lastName: "Tewari"),
-  Name(firstName: "Rohan", lastName: "Singh"),
-];
-
-class TapboxA extends StatefulWidget {
-  TapboxA({Key key}) : super(key: key);
-
+class HomePage extends StatefulWidget {
   @override
-  _TapboxAState createState() => _TapboxAState();
+
+
+  _HomePageState createState() => _HomePageState();
 }
 
-class _TapboxAState extends State<TapboxA> {
-  bool _active = false;
 
-  void _handleTap() {
+
+class _HomePageState extends State<HomePage> {
+
+
+
+
+
+
+  StreamSubscription<Map<String, double>> _locationSubscription;
+
+  Location _location = new Location();
+  bool _permission = false;
+  String error;
+
+  bool currentWidget = true;
+
+  Image image1;
+
+  Map data;
+  List userData;
+
+  Future getData() async {
+    http.Response response = await http.get(
+        "https://reqres.in/api/users?page=2");
+    data = json.decode(response.body);
     setState(() {
-      _active = !_active;
+      userData = data["data"];
     });
   }
 
+
+  @override
+  void initState() {
+    super.initState();
+    getData();
+    final GoogleMapOverlayController controller =
+    GoogleMapOverlayController.fromSize(width: 300.0, height: 200.0);
+    final Widget mapWidget = GoogleMapOverlay(controller: controller);
+
+    _locationSubscription =
+        _location.onLocationChanged().listen((Map<String,double> result) {
+          setState(() {
+            _currentLocation = result;
+          });
+        });
+  }
+  initPlatformState() async {
+    Map<String, double> location;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    //if (!mounted) return;
+
+
+  }
+  void addNumbers() {
+    setState(() {
+      print(position);
+
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: _handleTap,
-      child: Container(
-        child: Center(
-          child: Text(
-            _active ? 'Active' : 'Inactive',
-            style: TextStyle(fontSize: 32.0, color: Colors.white),
-          ),
+    List<Widget> widgets;
+    if (_currentLocation == null) {
+      widgets = new List();
+    } else {
+      widgets = [
+        new Image.network(
+            "https://maps.googleapis.com/maps/api/staticmap?center=${_currentLocation["latitude"]},${_currentLocation["longitude"]}&zoom=18&size=640x400&key=AIzaSyAAFXiekUVvfsAe1miEFxau1t-XG1oL5yg"),
+      ];
+    }
+
+
+    widgets.add(new Center(
+        child: new Text(_currentLocation != null
+            ? 'Continuous location: $_currentLocation\n'
+            : 'Error: $error\n')));
+
+    widgets.add(new Center(
+        child: new Text(_permission
+            ? 'Has permission : Yes'
+            : "Has permission : No")));
+    final Widget mapWidget = GoogleMapOverlay(controller: controller);
+    final mapController = controller.mapController;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("GPS Check In"),
+        actions: <Widget>[
+        IconButton(
+          icon: const Icon(Icons.my_location),
+          onPressed: () {
+            final location = LatLng(_currentLocation["latitude"], _currentLocation["longitude"]);
+            mapController.markers.clear();
+            mapController.addMarker(MarkerOptions(
+              position: location,
+            ));
+            mapController.animateCamera(
+              CameraUpdate.newLatLngZoom(
+                  location, 15.0),
+            );
+          },
         ),
-        width: 200.0,
-        height: 200.0,
-        decoration: BoxDecoration(
-          color: _active ? Colors.lightGreen[700] : Colors.grey[600],
+      ],
+        backgroundColor: Colors.green,
+      ),
+      body: new Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: new Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+
+          children: <Widget>[
+            MapsDemo(mapWidget, controller.mapController),
+
+
+            new Container(
+              height: 280.0,
+              child: new ListView.builder(
+                itemCount: userData == null ? 0 : userData.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Card(
+
+                    child: new ExpansionTile(
+                      title: new Text(
+                        "${userData[index]["first_name"]} ${userData[index]["last_name"]}",
+                        style: TextStyle(
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.w700,
+                        ),),
+                      children: <Widget>[
+
+                        new RaisedButton(
+                          padding: const EdgeInsets.all(8.0),
+                          textColor: Colors.white,
+                          color: Colors.blue,
+                          onPressed: addNumbers,
+                          child: new Text("Check in to group"),
+                        ),
+                      ],
+
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+
         ),
       ),
     );
   }
 }
 
-//------------------------- MyApp ----------------------------------
-
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'Check In App',
-        home: Scaffold(
-          appBar: AppBar(
-            title: Text('Check In App'),
-          ),
-          body: Center(
-            child: table(),
-          ),
-
-        )
-    );
-  }
-}
-//    floatingActionButton: new FloatingActionButton(
-////        onPressed: _incrementCounter,
-////        tooltip: 'Increment',
-////        child: new Icon(Icons.add),
-////      ), // This trailing comma makes auto-formatting nicer for build methods.
-
-
-
-//import 'package:flutter/material.dart';
-//
-//void main() => runApp(new MyApp());
-//
-//class MyApp extends StatelessWidget {
-//  // This widget is the root of your application.
-//  @override
-//  Widget build(BuildContext context) {
-//    return new MaterialApp(
-//      title: 'Flutter Demo',
-//      theme: new ThemeData(
-//        // This is the theme of your application.
-//        //
-//        // Try running your application with "flutter run". You'll see the
-//        // application has a blue toolbar. Then, without quitting the app, try
-//        // changing the primarySwatch below to Colors.green and then invoke
-//        // "hot reload" (press "r" in the console where you ran "flutter run",
-//        // or press Run > Flutter Hot Reload in IntelliJ). Notice that the
-//        // counter didn't reset back to zero; the application is not restarted.
-//        primarySwatch: Colors.blue,
-//      ),
-//      home: new MyHomePage(title: 'Flutter Demo Home Page'),
-//    );
-//  }
-//}
-//
-//class MyHomePage extends StatefulWidget {
-//  MyHomePage({Key key, this.title}) : super(key: key);
-//
-//  // This widget is the home page of your application. It is stateful, meaning
-//  // that it has a State object (defined below) that contains fields that affect
-//  // how it looks.
-//
-//  // This class is the configuration for the state. It holds the values (in this
-//  // case the title) provided by the parent (in this case the App widget) and
-//  // used by the build method of the State. Fields in a Widget subclass are
-//  // always marked "final".
-//
-//  final String title;
-//
-//  @override
-//  _MyHomePageState createState() => new _MyHomePageState();
-//}
-//
-//class _MyHomePageState extends State<MyHomePage> {
-//  int _counter = 0;
-//
-//  void _incrementCounter() {
-//    setState(() {
-//      // This call to setState tells the Flutter framework that something has
-//      // changed in this State, which causes it to rerun the build method below
-//      // so that the display can reflect the updated values. If we changed
-//      // _counter without calling setState(), then the build method would not be
-//      // called again, and so nothing would appear to happen.
-//      _counter++;
-//    });
-//  }
-//
-//  @override
-//  Widget build(BuildContext context) {
-//    // This method is rerun every time setState is called, for instance as done
-//    // by the _incrementCounter method above.
-//    //
-//    // The Flutter framework has been optimized to make rerunning build methods
-//    // fast, so that you can just rebuild anything that needs updating rather
-//    // than having to individually change instances of widgets.
-//    return new Scaffold(
-//      appBar: new AppBar(
-//        // Here we take the value from the MyHomePage object that was created by
-//        // the App.build method, and use it to set our appbar title.
-//        title: new Text(widget.title),
-//      ),
-//      body: new Center(
-//        // Center is a layout widget. It takes a single child and positions it
-//        // in the middle of the parent.
-//        child: new Column(
-//          // Column is also layout widget. It takes a list of children and
-//          // arranges them vertically. By default, it sizes itself to fit its
-//          // children horizontally, and tries to be as tall as its parent.
-//          //
-//          // Invoke "debug paint" (press "p" in the console where you ran
-//          // "flutter run", or select "Toggle Debug Paint" from the Flutter tool
-//          // window in IntelliJ) to see the wireframe for each widget.
-//          //
-//          // Column has various properties to control how it sizes itself and
-//          // how it positions its children. Here we use mainAxisAlignment to
-//          // center the children vertically; the main axis here is the vertical
-//          // axis because Columns are vertical (the cross axis would be
-//          // horizontal).
-//          mainAxisAlignment: MainAxisAlignment.center,
-//          children: <Widget>[
-//            new Text(
-//              'You have pushed the button this many times:',
-//            ),
-//            new Text(
-//              '$_counter',
-//              style: Theme.of(context).textTheme.display1,
-//            ),
-//          ],
-//        ),
-//      ),
-//      floatingActionButton: new FloatingActionButton(
-//        onPressed: _incrementCounter,
-//        tooltip: 'Increment',
-//        child: new Icon(Icons.add),
-//      ), // This trailing comma makes auto-formatting nicer for build methods.
-//    );
-//  }
-//}
