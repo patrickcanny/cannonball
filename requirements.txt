@@ -1,2 +1,3 @@
 Flask
 Flask-PyMongo
+gunicorn==19.7.1
