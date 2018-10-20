@@ -28,6 +28,11 @@ def test():
     app.logger.debug("Got Request from Flutter")
     return 'Nice! You Triggered it!'
 
+@app.route("/getEvents", methods=['GET'])
+def events():
+    events = mongo.db.events.find()
+    app.logger.info(events)
+    return dumps(events)
 
 @app.route("/newUser", methods=['POST'])
 def insertNewUser():
@@ -72,14 +77,6 @@ def goLive():
         longi = parsed_json['longitude']
         # mongo.db.collection.updateOne({key == groupkey}, $set: {'live': True}, False)
         return 'updated group'
-
-
-
-
-@app.route("/createGroup", methods=['GET'])
-def buildGroup():
-    app.logger.info("Creating new group...")
-
 
 # LAUNCH APP
 if __name__ == "__main__":
