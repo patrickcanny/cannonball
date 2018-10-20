@@ -3,6 +3,7 @@
 import os
 import urllib
 import json
+import math
 from bson import Binary, Code
 from bson.json_util import dumps, loads
 from bson.objectid import ObjectId
@@ -182,6 +183,33 @@ def slackExport():
 
 
     return "invites sent"
+
+@app.route("/getNearbyEvents", methods = ['POST'])
+def getNearbyEvents():
+    app.logger.info('recieved')
+    location = request.get_json()
+    curLong = location.get('longitude')
+    curLat = location.get('latitude')
+    app.logger.info(curLong)
+    app.logger.info(curLat)
+    myEvents = mongo.db.events.find({})
+    nearbyEvents = []
+    for x in myEvents:
+        if distance(float(curLat), float(x.get('latitude')), float(curLong), float(x.get('longitude'))) < 2 :
+            nearbyEvents.append(x.get('name'))
+    return dumps(nearbyEvents)
+
+
+
+
+def distance(lat1, lat2, long1, long2):
+    dlong = long2 - long1
+    dlat = lat2 -lat1
+    a = (math.sin(dlat/2))**2 + math.cos(lat1) * math.cos(lat2) * (math.sin(dlong/2))**2
+    c = 2 * math.atan2( math.sqrt(a), math.sqrt(1-a) )
+    d = 3961 * c
+    return d
+
 
 # LAUNCH APP
 if __name__ == "__main__":
