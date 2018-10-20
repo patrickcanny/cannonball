@@ -3,7 +3,9 @@
 import os
 import urllib
 import json
-from flask import Flask, render_template, request, flash, redirect, url_for, session, logging
+from bson import Binary, Code
+from bson.json_util import dumps
+from flask import Flask, render_template, request, flash, redirect, url_for, session, logging, jsonify
 from flask_pymongo import PyMongo
 
 # END IMPORTS
@@ -32,22 +34,21 @@ def insertNewUser():
     newUser = request.get_json()
     app.logger.info(newUser)
     mongo.db.users.insert(newUser)
-    return 'user inserted'
+    return dumps(newUser)
 
 @app.route("/newGroup", methods=['POST'])
 def insertNewGroup():
     newGroup = request.get_json()
     app.logger.info(newGroup)
     mongo.db.groups.insert(newGroup)
-    s = "Created new Group: " + str(newGroup)
-    return s
+    return dumps(newGroup)
 
 @app.route("/newEvent", methods=['POST'])
 def insertNewEvent():
     newEvent = request.get_json()
     app.logger.info(newEvent)
     mongo.db.events.insert(newEvent)
-    return 'Created new Event:{}', newEvent
+    return dumps(newEvent)
 
 @app.route("/checkInUser", methods=['GET'])
 def checkInUser():
