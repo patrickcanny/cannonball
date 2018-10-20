@@ -34,6 +34,20 @@ def insertNewUser():
     mongo.db.users.insert(newUser)
     return 'user inserted'
 
+@app.route("/newGroup", methods=['POST'])
+def insertNewGroup():
+    newGroup = request.get_json()
+    app.logger.info(newGroup)
+    mongo.db.groups.insert(newGroup)
+    s = "Created new Group: " + str(newGroup)
+    return s
+
+@app.route("/newEvent", methods=['POST'])
+def insertNewEvent():
+    newEvent = request.get_json()
+    app.logger.info(newEvent)
+    mongo.db.events.insert(newEvent)
+    return 'Created new Event:{}', newEvent
 
 @app.route("/checkInUser", methods=['GET'])
 def checkInUser():
