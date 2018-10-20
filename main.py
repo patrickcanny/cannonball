@@ -45,12 +45,10 @@ def usersByEvent():
 
     userDict = {}
     i = 0
-    for user in users:
-        uid = user.get('_id')
+    for uid in users:
         elt = mongo.db.users.find_one({"_id": uid})
-        userdict[i] = elt
+        userDict[i] = elt
         i += 1
-    app.logger.info("UserDict: ", userDict)
     return dumps(userDict)
 
 @app.route("/newUser", methods=['POST'])
