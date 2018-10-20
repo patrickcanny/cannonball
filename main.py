@@ -111,6 +111,14 @@ def getAllGroupsForUser():
     return dumps(groups)
 
 
+def distance(self, lat1, lat2, long1, long2):
+    dlong = long2 - long1
+    dlat = lat2 -lat1
+    a = (sin(dlat/2))^2 + cos(lat1) * cos(lat2) * (sin(dlong/2))^2 
+    c = 2 * atan2( sqrt(a), sqrt(1-a) ) 
+    d = 3961 * c
+
+
 # LAUNCH APP
 if __name__ == "__main__":
         port = int(os.environ.get("PORT", 5000))
