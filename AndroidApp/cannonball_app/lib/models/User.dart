@@ -1,13 +1,22 @@
 class User {
-  final String firstName;
-  final String lastName;
-  final String email;
-  final String phoneNumber;
+  String firstName;
+  String lastName;
+  String email;
+  String phoneNumber;
 
-  const User({
+  User({
     this.firstName,
     this.lastName,
     this.email,
     this.phoneNumber
   });
+
+  Map<String, dynamic> toJson() =>
+  {
+    'f_name': firstName,
+    'l_name': lastName,
+    'email': email,
+    'phone': phoneNumber,
+    'groups': ''
+  };
 }
