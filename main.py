@@ -45,7 +45,19 @@ def checkInUser():
 @app.route("/goLive", methods=['GET'])
 def goLive():
     json_string = request.args.to_dict()
-    parsed
+    parsed_json = json.loads(json_string)
+    groupkey = parsed_json['groupkey']
+    targetGroup = mongo.db.groups.find( {key == groupkey})
+    if targetGroup == None:
+        return 'no groups found'
+    else:
+        radius = parsed_json['radius']
+        lat = parsed_json['latitude']
+        longi = parsed_json['longitude']
+        mongo.db.collection.updateOne({key == groupkey}, $set: {'live': True}, False)
+        return 'updated group'
+        
+        
 
 
 # LAUNCH APP
