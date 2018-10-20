@@ -1,0 +1,8 @@
+{
+  "_id:":"ObjectId('id')",
+  "email":"example@example.com",
+  "phone":1234567890,
+  "groups":[
+    0: "ObjectId('id')"
+  ]
+}

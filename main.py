@@ -5,6 +5,7 @@ import urllib
 import json
 from bson import Binary, Code
 from bson.json_util import dumps
+from bson.objectid import ObjectId
 from flask import Flask, render_template, request, flash, redirect, url_for, session, logging, jsonify
 from flask_pymongo import PyMongo
 # END IMPORTS
@@ -68,8 +69,20 @@ def insertNewGroup():
 @app.route("/newEvent", methods=['POST'])
 def insertNewEvent():
     newEvent = request.get_json()
+    name = newEvent.get('name')
+    groupId = newEvent.get('groupid')
+    app.logger.info(groupId)
     app.logger.info(newEvent)
     mongo.db.events.insert(newEvent)
+    event = mongo.db.events.find_one({'name': name})
+    eid = event.get('_id')
+    group = mongo.db.groups.find_one({'_id': ObjectId(groupId)})
+    app.logger.info(group)
+    groupEvents = group.get('events')
+    if eid not in groupEvents:
+        mongo.db.groups.update_one({'_id': ObjectId(groupId)},{'$push':{'events':eid}})
+        app.logger.info("Added event to group {}", gid)
+
     return dumps(newEvent)
 
 @app.route("/checkInUser", methods=['POST'])
