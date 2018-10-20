@@ -12,7 +12,7 @@ from flask_pymongo import PyMongo
 app = Flask(__name__, static_folder="../static", template_folder="../static")
 
 # CONFIG
-app.config["MONGO_URI"] = "mongodb://" + urllib.parse.quote("cannonball") + ":" + urllib.parse.quote("test") + "@cluster0-shard-00-00-pevs9.gcp.mongodb.net:27017,cluster0-shard-00-01-pevs9.gcp.mongodb.net:27017,cluster0-shard-00-02-pevs9.gcp.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true"
+app.config["MONGO_URI"] = "mongodb://" + urllib.parse.quote("cannonball") + ":" + urllib.parse.quote("test") + "@cluster0-shard-00-00-pevs9.gcp.mongodb.net:27017,cluster0-shard-00-01-pevs9.gcp.mongodb.net:27017,cluster0-shard-00-02-pevs9.gcp.mongodb.net:27017/CannonballDB?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true"
 app.debug=True
 mongo = PyMongo(app)
 
@@ -42,7 +42,10 @@ def checkInUser():
     groupkey = parsed_json['groupkey']
     return 'placeholder'
 
-
+@app.route("/goLive", methods=['GET'])
+def goLive():
+    json_string = request.args.to_dict()
+    parsed
 
 
 # LAUNCH APP
