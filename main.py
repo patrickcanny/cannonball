@@ -81,6 +81,17 @@ def checkInUser():
     targetEvent = mongo.db.events.find_one({'name': event})
     useremail = newCheckIn.get('email')
     targetUser = mongo.db.users.find_one({'email': useremail})
+    targetGroup = targetEvent.get('groupid')
+    groups = targetUser.get('groups')
+    found = False
+    for x in groups:
+        if x == targetGroup :
+            found = True
+            break
+    if found == False :
+        app.logger.info("FALSE")
+        myId = targetUser.get('_id')
+        mongo.db.users.update_one({'_id': myId}, {'$push': {'groups': targetGroup}})
     app.logger.info(targetUser)
     app.logger.info(targetEvent)
     userId = targetUser.get("_id")
