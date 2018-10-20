@@ -59,10 +59,13 @@ def usersByEvent():
 
 @app.route("/newUser", methods=['POST'])
 def insertNewUser():
-    newUser = request.get_json()
-    app.logger.info(newUser)
-    mongo.db.users.insert(newUser)
-    return dumps(newUser)
+    try:
+        newUser = request.get_json()
+        app.logger.info(newUser)
+        mongo.db.users.insert(newUser)
+        return dumps(newUser)
+    except:
+        return "there was an error in creating a new user: {}".format(newUser)
 
 @app.route("/newGroup", methods=['POST'])
 def insertNewGroup():
