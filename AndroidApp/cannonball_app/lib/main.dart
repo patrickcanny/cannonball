@@ -2,8 +2,16 @@ import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
 
-class table extends StatefulWidget{
+class table extends StatefulWidget {
+  const table({ Key key }) : super(key: key);
+
   @override
+  _Table createState() => _Table();
+}
+
+
+class _Table extends State<table>{
+
   Widget bodyData() => DataTable(
       onSelectAll: (b) {},
       sortColumnIndex: 1,
@@ -109,25 +117,26 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Check In App',
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Check In App'),
-        ),
-        body: Center(
-          child: TapboxA(),
-        ),
+        title: 'Check In App',
+        home: Scaffold(
+          appBar: AppBar(
+            title: Text('Check In App'),
+          ),
+          body: Center(
+            child: table(),
+          ),
 
         )
-      ),
     );
+  }
+}
 //    floatingActionButton: new FloatingActionButton(
 ////        onPressed: _incrementCounter,
 ////        tooltip: 'Increment',
 ////        child: new Icon(Icons.add),
 ////      ), // This trailing comma makes auto-formatting nicer for build methods.
-  }
-}
+
+
 
 //import 'package:flutter/material.dart';
 //
