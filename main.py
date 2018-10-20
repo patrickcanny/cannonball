@@ -94,6 +94,17 @@ def checkInUser():
     targetEvent = mongo.db.events.find_one({'name': event})
     useremail = newCheckIn.get('email')
     targetUser = mongo.db.users.find_one({'email': useremail})
+    targetGroup = targetEvent.get('groupid')
+    groups = targetUser.get('groups')
+    found = False
+    for x in groups:
+        if x == targetGroup :
+            found = True
+            break
+    if found == False :
+        app.logger.info("FALSE")
+        myId = targetUser.get('_id')
+        mongo.db.users.update_one({'_id': myId}, {'$push': {'groups': targetGroup}})
     app.logger.info(targetUser)
     app.logger.info(targetEvent)
     userId = targetUser.get("_id")
@@ -101,6 +112,16 @@ def checkInUser():
     if myId != None :
         mongo.db.events.update_one({'_id': myId}, {'$push': {'checkedInUsers': userId}})
     return 'placeholder'
+
+
+@app.route("/userGroups", methods=['POST'])
+def getAllGroupsForUser():
+    app.logger.info('recieved')
+    theUser = request.get_json()
+    useremail = theUser.get('email')
+    targetUser = mongo.db.users.find_one({'email': useremail})
+    groups = targetUser.get('groups')
+    return dumps(groups)
 
 
 # LAUNCH APP
