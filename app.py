@@ -2,6 +2,7 @@
 # IMPORTS
 import os
 import urllib
+import json
 from flask import Flask, render_template, request, flash, redirect, url_for, session, logging
 from flask_pymongo import PyMongo
 
@@ -20,6 +21,22 @@ def test():
     mongo.db.users.insert({"name": "harrrrrry" })
     app.logger.debug("Got Request from Flutter")
     return 'Nice! You Triggered it!'
+
+
+@app.route("/newUser", methods=['GET'])
+def insertNewUser():
+    newUser = request.args.to_dict()
+    mongo.db.users.insert(newUser)
+    return 'user inserted'
+
+
+@app.route("/checkInUser", methods=['GET'])
+def checkInUser():
+    json_string = request.args.to_dict()
+    parsed_json = json.loads(json_string)
+    userkey = parsed_json['userkey']
+    groupkey = parsed_json['groupkey']
+    return 'placeholder'
 
 
 
