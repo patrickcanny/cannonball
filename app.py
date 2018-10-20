@@ -11,18 +11,21 @@ from flask_pymongo import PyMongo
 app = Flask(__name__, static_folder="../static", template_folder="../static")
 
 # CONFIG
-app.config["MONGO_URI"] = "mongodb://" + urllib.parse.quote("marshingjay@ku.edu") + ":" + urllib.parse.quote("Sportingbv#9") + "@cluster0-shard-00-00-pevs9.gcp.mongodb.net:27017,cluster0-shard-00-01-pevs9.gcp.mongodb.net:27017,cluster0-shard-00-02-pevs9.gcp.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true"
+app.config["MONGO_URI"] = "mongodb://" + urllib.parse.quote("cannonball") + ":" + urllib.parse.quote("test") + "@cluster0-shard-00-00-pevs9.gcp.mongodb.net:27017,cluster0-shard-00-01-pevs9.gcp.mongodb.net:27017,cluster0-shard-00-02-pevs9.gcp.mongodb.net:27017/CannonballDB?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true"
 app.debug=True
 mongo = PyMongo(app)
 
 @app.route("/test", methods=['GET'])
 def test():
-    mongo.db.users.insert({"name": "jacob" })
+    mongo.db.users.insert({"name": "harrrrrry" })
     app.logger.debug("Got Request from Flutter")
     return 'Nice! You Triggered it!'
 
+
+
+
 # LAUNCH APP
 if __name__ == "__main__":
-        port = int(os.environ.get("PORT", 5000))
+        port = int(os.environ.get("PORT", 8080))
         app.logger.info("Getting Flask up and running...\n")
-        app.run(host = '0.0.0.0' , port = port)
+        app.run(host = '127.0.0.1' , port = port)
