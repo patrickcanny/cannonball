@@ -73,6 +73,16 @@ def checkInUser():
     return 'placeholder'
 
 
+@app.route("/userGroups", methods=['POST'])
+def getAllGroupsForUser():
+    app.logger.info('recieved')
+    theUser = request.get_json()
+    useremail = theUser.get('email')
+    targetUser = mongo.db.users.find_one({'email': useremail})
+    groups = targetUser.get('groups')
+    return dumps(groups)
+
+
 # LAUNCH APP
 if __name__ == "__main__":
         port = int(os.environ.get("PORT", 5000))
