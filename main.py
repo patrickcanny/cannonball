@@ -7,8 +7,13 @@ from bson import Binary, Code
 from bson.json_util import dumps
 from flask import Flask, render_template, request, flash, redirect, url_for, session, logging, jsonify
 from flask_pymongo import PyMongo
-
 # END IMPORTS
+
+# HERE API
+here_appId = "yDIiTl1dh0pFhmMq7Ggf"
+here_appCode = "Lz4ozsXQflfSlfcFpG74jw"
+here_baseURL = "https://pos.api.here.com/positioning/v1/"
+# END HERE
 
 # Define App requirements
 app = Flask(__name__, static_folder="../static", template_folder="../static")
@@ -22,17 +27,29 @@ mongo = PyMongo(app)
 def index():
     return("<h1>Cannonball!</h1>")
 
-@app.route("/test", methods=['GET'])
-def test():
-    mongo.db.users.insert({"user": "patrick"})
-    app.logger.debug("Got Request from Flutter")
-    return 'Nice! You Triggered it!'
-
 @app.route("/getEvents", methods=['GET'])
 def events():
     events = mongo.db.events.find()
     app.logger.info(events)
     return dumps(events)
+
+# {{URL}}/getUsersForEvent?event={event name}
+@app.route("/getUsersForEvent", methods = ['GET'])
+def usersByEvent():
+    eventName = request.args.get('name')
+    app.logger.info(eventName)
+    event = mongo.db.events.find_one({'name': eventName})
+    app.logger.info(event)
+    users = event.get('checkedInUsers')
+    app.logger.info(users)
+
+    userDict = {}
+    i = 0
+    for uid in users:
+        elt = mongo.db.users.find_one({"_id": uid})
+        userDict[i] = elt
+        i += 1
+    return dumps(userDict)
 
 @app.route("/newUser", methods=['POST'])
 def insertNewUser():
