@@ -15,6 +15,10 @@ app.config["MONGO_URI"] = "mongodb://" + urllib.parse.quote("cannonball") + ":" 
 app.debug=True
 mongo = PyMongo(app)
 
+@app.route("/")
+def index():
+    return("<h1>Cannonball!</h1>")
+
 @app.route("/test", methods=['GET'])
 def test():
     mongo.db.users.insert({"user": "patrick"})
