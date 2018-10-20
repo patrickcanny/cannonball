@@ -74,28 +74,23 @@ def insertNewEvent():
     mongo.db.events.insert(newEvent)
     return dumps(newEvent)
 
-@app.route("/checkInUser", methods=['GET'])
+@app.route("/checkInUser", methods=['POST'])
 def checkInUser():
-    json_string = request.args.to_dict()
-    parsed_json = json.loads(json_string)
-    userkey = parsed_json['userkey']
-    groupkey = parsed_json['groupkey']
+    app.logger.info('recieved')
+    newCheckIn = request.get_json()
+    app.logger.info(newCheckIn)
+    event = newCheckIn.get('name')
+    targetEvent = mongo.db.events.find_one({'name': event})
+    useremail = newCheckIn.get('email')
+    targetUser = mongo.db.users.find_one({'email': useremail})
+    app.logger.info(targetUser)
+    app.logger.info(targetEvent)
+    userId = targetUser.get("_id")
+    myId = targetEvent.get("_id")
+    if myId != None :
+        mongo.db.events.update_one({'_id': myId}, {'$push': {'checkedInUsers': userId}})
     return 'placeholder'
 
-@app.route("/goLive", methods=['GET'])
-def goLive():
-    json_string = request.args.to_dict()
-    parsed_json = json.loads(json_string)
-    groupkey = parsed_json['groupkey']
-    targetGroup = mongo.db.groups.find( {key == groupkey})
-    if targetGroup == None:
-        return 'no groups found'
-    else:
-        radius = parsed_json['radius']
-        lat = parsed_json['latitude']
-        longi = parsed_json['longitude']
-        # mongo.db.collection.updateOne({key == groupkey}, $set: {'live': True}, False)
-        return 'updated group'
 
 # LAUNCH APP
 if __name__ == "__main__":
