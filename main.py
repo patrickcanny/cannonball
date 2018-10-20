@@ -27,9 +27,10 @@ def test():
     return 'Nice! You Triggered it!'
 
 
-@app.route("/newUser", methods=['GET'])
+@app.route("/newUser", methods=['POST'])
 def insertNewUser():
-    newUser = request.args.to_dict()
+    newUser = request.get_json()
+    app.logger.info(newUser)
     mongo.db.users.insert(newUser)
     return 'user inserted'
 
@@ -54,10 +55,15 @@ def goLive():
         radius = parsed_json['radius']
         lat = parsed_json['latitude']
         longi = parsed_json['longitude']
-        mongo.db.collection.updateOne({key == groupkey}, $set: {'live': True}, False)
+        # mongo.db.collection.updateOne({key == groupkey}, $set: {'live': True}, False)
         return 'updated group'
-        
-        
+
+
+
+
+@app.route("/createGroup", methods=['GET'])
+def buildGroup():
+    app.logger.info("Creating new group...")
 
 
 # LAUNCH APP
