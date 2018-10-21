@@ -37,7 +37,6 @@ LOGGER.debug(SlackClient(tok))
 slack_client = SlackClient(tok)
 LOGGER.debug(slack_client.api_call("api.test"))
 
-
 '''@params'''
 @app.route("/")
 def index():
@@ -120,17 +119,32 @@ def insertNewGroup():
     LOGGER.debug(newGroup)
     newusers = []
     newadmins = []
+    gname = newGroup['name']
     creatoremail = newGroup['email']
     creator = mongo.db.users.find_one({'email':creatoremail})
     uid = creator.get('_id')
     newusers.append(uid)
+    newGroup['users'] = newusers
+    LOGGER.debug(newGroup['users'])
 
-    if newGroup.get('users'):
-        for user in newGroup.get('users'):
+    if newGroup['users']:
+        for user in newGroup['users']:
             try:
-                uid = str(user['$oid'])
-                obj = ObjectId(uid)
-                newusers.append(obj)
+                LOGGER.debug('in loop')
+                LOGGER.debug('Initial User Info: {}'.format(user))
+                LOGGER.debug('USER: {}'.format(user))
+                LOGGER.debug(mongo.db.users.find_one({'_id':ObjectId(user)}))
+                mongo.db.users.update_one({'_id':ObjectId(user)}, {'$push':{'groups': gname}})
+                LOGGER.debug(mongo.db.users.find_one({'_id':ObjectId(user)}))
+
+                if user.get('$oid'):
+                    uid = str(user['$oid'])
+                    LOGGER.debug("UID: {}".format(uid))
+                    obj = ObjectId(uid)
+                    newusers.append(obj)
+                    LOGGER.debug("Parsed oid")
+
+                LOGGER.debug("Updated groups")
             except:
                 pass
 
@@ -140,7 +154,6 @@ def insertNewGroup():
             obj = ObjectId(uid)
             newadmins.append(obj)
 
-    LOGGER.debug(newusers)
     newGroup['users'] = newusers
     newGroup['admins'] = newadmins
     LOGGER.info(newGroup)
@@ -156,10 +169,7 @@ def insertNewEvent():
     newEvent = request.get_json()
     name = newEvent.get('name')
     LOGGER.info(newEvent)
-    gid = str(newEvent.get('groupid')['$oid'])
-    LOGGER.info(gid)
-    newEvent['groupid'] = ObjectId(gid)
-    LOGGER.info(newEvent)
+    email = newEvent.get('email')
     mongo.db.events.insert(newEvent)
     try:
         event = mongo.db.events.find_one({'name': name})
@@ -167,13 +177,12 @@ def insertNewEvent():
     except:
         return "Could not find newly created event. Perhaps your group does not exist"
     try:
-        group = mongo.db.groups.find_one({'_id': ObjectId(gid)})
+        group = mongo.db.groups.find_one({'email': email})
     except:
         return "Group not found, please create a new group first."
     groupEvents = group.get('events')
-    if eid not in groupEvents:
-        mongo.db.groups.update_one({'_id': ObjectId(gid)},{'$push':{'events':eid}})
-    newEvent.update_one({''})
+    if not groupEvents or eid not in groupEvents:
+        mongo.db.groups.update_one({'email':email},{'$push':{'events':eid}})
     return dumps(newEvent)
 
 '''
@@ -229,7 +238,7 @@ def getAllGroupsForUser():
     for x in groups:
         groupNames.append(x.get('name'))
 
-    return groupNames
+    return str(groupNames)
 
 '''
 @params
