@@ -8,15 +8,13 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 class SignIn extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn googleSignIn = GoogleSignIn(
-    scopes: <String>[
-      'email',
-      'https://www.googleapis.com/auth/contacts.readonly',
-    ],
-  );
+  final GoogleSignIn googleSignIn = GoogleSignIn();
 
   Future<FirebaseUser> _signIn() async {
+    print(_auth);
+    print(googleSignIn);
     GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
+    print(googleSignInAccount);
     GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount.authentication;
 
     FirebaseUser user = await _auth.signInWithGoogle(
@@ -46,10 +44,9 @@ class SignIn extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             new RaisedButton(
-//              onPressed: ()=> _signIn()
-//                .then((FirebaseUser user) => print(user))
-//                .catchError((e) => print(e)),
-              onPressed: () => _signIn(),
+              onPressed: ()=> _signIn()
+                .then((FirebaseUser user) => print(user))
+                .catchError((e) => print(e)),
               child: new Text("Sign In"),
               color: Colors.green,
             ),
