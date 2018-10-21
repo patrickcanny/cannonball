@@ -41,9 +41,9 @@ def authenticate():
     try:
         user = mongo.db.users.find_one({'f_name':f_name},{'l_name':l_name, 'email':email})
         LOGGER.info("Found User {}".format(user))
-        return True
+        return dumps(user)
     except:
-        return False
+        return {}
 
 @app.route("/getEvents", methods=['GET'])
 def events():
