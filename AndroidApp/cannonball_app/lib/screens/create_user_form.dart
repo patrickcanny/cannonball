@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:validate/validate.dart';
 import 'package:cannonball_app/models/User.dart';
 import 'package:cannonball_app/util/requests.dart';
+import 'package:cannonball_app/util/session_controller.dart';
 import 'package:cannonball_app/screens/home_page.dart';
 
 class CreateUserForm extends StatefulWidget {
@@ -37,6 +38,7 @@ class CreateUserFormState extends State<CreateUserForm> {
   void submit() async {
     if (this._formKey.currentState.validate()) {
       _formKey.currentState.save(); // Save our form now.
+      SessionController.currentUser = user;
       Requests.POST(user.toJson(), "newUser");
 
       Navigator.push(

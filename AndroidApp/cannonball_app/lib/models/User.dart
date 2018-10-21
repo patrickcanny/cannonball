@@ -11,6 +11,12 @@ class User {
     this.phoneNumber
   });
 
+  User.fromJson(Map<String, dynamic> json)
+      : firstName = json['f_name'],
+        lastName = json['l_name'],
+        email = json['email'],
+        phoneNumber = json['phone'];
+
   Map<String, dynamic> toJson() =>
   {
     'f_name': firstName,
