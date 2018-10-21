@@ -29,7 +29,8 @@ class MapsDemo extends StatelessWidget {
     coords.latitude = _currentLocation["latitude"];
     coords.longitude = _currentLocation["longitude"];
     events = json.decode(await(Requests.POST(coords.toJson(), "/getNearbyEvents")));
-  }
+    events = ["The Curling Club" , "Pray"];
+ }
   void retreiveGroups() async {
     Map m = {"email": SessionController.currentUserId()};
     groups = json.decode(await(Requests.POST(m, "/userGroups")));
@@ -48,7 +49,7 @@ class MapsDemo extends StatelessWidget {
             child: const Text('Update Current Location'),
             onPressed: () {
               retreiveEvents();
-              //retreiveGroups();
+              retreiveGroups();
               controller.animateCamera(CameraUpdate.newCameraPosition(
                 CameraPosition(
                   bearing: 270.0,
@@ -80,7 +81,7 @@ class _HomePageState extends State<HomePage> {
   Location _location = new Location();
   bool _permission = false;
   String error;
-  bool _active = false;
+  bool _active = true;
 
   bool currentWidget = true;
 
