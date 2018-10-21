@@ -235,7 +235,8 @@ def getAllGroupsForUser():
     targetUser = mongo.db.users.find_one({'email': useremail})
     groups = targetUser.get('groups')
     LOGGER.debug(groups)
-    return str(groups)
+    [x.encode('utf-8') for x in groups]
+    return str(groups).encode('utf-8')
 
 '''
 @params
