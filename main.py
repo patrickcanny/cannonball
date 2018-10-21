@@ -260,7 +260,7 @@ def getNearbyEvents():
     curLat = location.get('latitude')
     LOGGER.info(curLong)
     LOGGER.info(curLat)
-    myEvents = mongo.db.events.find({"active": True})
+    myEvents = mongo.db.events.find({"isActive": True})
     nearbyEvents = []
     for x in myEvents:
         if distance(float(curLat), float(x.get('latitude')), float(curLong), float(x.get('longitude'))) < 2 :
