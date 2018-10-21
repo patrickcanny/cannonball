@@ -3,7 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:cannonball_app/models/Coordinates.dart';
-import 'package:cannonball_app/models/SlackGroup.dart';
+import 'package:cannonball_app/models/Group.dart';
 import 'package:cannonball_app/models/NewGroup.dart';
 import 'package:cannonball_app/models/UserCheckIn.dart';
 import 'package:cannonball_app/util/requests.dart';
@@ -139,17 +139,49 @@ class _HomePageState extends State<HomePage> {
     Requests.POST(groupToAdd.toJson(), "/newGroup");
   }
 
+
   void slackExport(String group) async {
-      SlackGroup newSlack = new SlackGroup();
-      newSlack.group = group;
       String query = "/exportToSlack?group="+group;
       Requests.POST(null, query);
   }
 
-  void addNumbers() {
-    setState(() {
-      print(position);
-    });
+  Future<Null> _renderEventPopUp() async {
+    final textController = TextEditingController();
+
+    return showDialog<Null>(
+      context: context,
+      barrierDismissible: true, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Create Event'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                TextField(
+                  controller: textController,
+                  decoration: new InputDecoration(
+                      labelText: 'Event Name'
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Create'),
+              onPressed: () {
+                Group group = new Group();
+                group.name = textController.text;
+                group.email = SessionController.currentUserId();
+
+                Requests.POST(group.toJson(), 'newGroup');
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -175,12 +207,12 @@ class _HomePageState extends State<HomePage> {
             : "Has permission : No")));
     final Widget mapWidget = GoogleMapOverlay(controller: controller);
     final mapController = controller.mapController;
+
     return Scaffold(
       appBar: AppBar(
 
         title: Text("GPS Check In"),
         actions: <Widget>[
-
 
           IconButton(
           icon: const Icon(Icons.my_location),
@@ -204,8 +236,6 @@ class _HomePageState extends State<HomePage> {
         children: <Widget>[
          UserAccountsDrawerHeader(accountName: new Text("Harrison Luo"),accountEmail: new Text("luo.harrison@yahoo.com"), /*currentAccountPicture: new Image.asset('varun'), */decoration: BoxDecoration(color: new Color.fromRGBO(36, 120, 65, 1.0),
          ),),
-
-
 
                  ListTile(
                    title: new Text(
@@ -264,8 +294,8 @@ class _HomePageState extends State<HomePage> {
                        padding: const EdgeInsets.all(8.0),
                        textColor: Colors.white,
                        color: Colors.blue,
-                       onPressed:(){ checkIn(events[index], SessionController.currentUserId()); },
-                       child: new Text("Check in group"),
+                       onPressed:(){ _renderEventPopUp(); },
+                       child: new Text("Create Event"),
 
                      ),
                      new RaisedButton(
