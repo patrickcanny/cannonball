@@ -1,0 +1,5 @@
+Flask
+Flask-PyMongo
+gunicorn==19.7.1
+slackclient==1.0.0
+python-dotenv
