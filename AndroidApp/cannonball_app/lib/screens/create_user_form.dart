@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:validate/validate.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'dart:io';
-import 'dart:async';
 import 'package:cannonball_app/models/User.dart';
 import 'package:cannonball_app/util/requests.dart';
 
@@ -40,7 +36,7 @@ class CreateUserFormState extends State<CreateUserForm> {
   void submit() async {
     if (this._formKey.currentState.validate()) {
       _formKey.currentState.save(); // Save our form now.
-      
+
       Requests.POST(user.toJson(), "newUser");
     }
   }

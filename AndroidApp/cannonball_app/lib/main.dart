@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cannonball_app/screens/create_user_form.dart';
-import 'package:cannonball_app/screens/sign_in.dart';
+import 'package:cannonball_app/screens/home_page.dart';
 
 void main() => runApp(Cannonball());
 
@@ -14,7 +13,7 @@ class Cannonball extends StatelessWidget {
             title: Text('Check In App'),
           ),
           body: Center(
-            child: CreateUserForm(),
+            child: HomePage(),
           ),
         )
     );
