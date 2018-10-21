@@ -17,6 +17,6 @@ class User {
     'l_name': lastName,
     'email': email,
     'phone': phoneNumber,
-    'groups': ''
+    'groups': []
   };
 }

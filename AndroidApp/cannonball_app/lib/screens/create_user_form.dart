@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:validate/validate.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:io';
+import 'dart:async';
 import 'package:cannonball_app/models/User.dart';
 
 class CreateUserForm extends StatefulWidget {
@@ -34,16 +36,25 @@ class CreateUserFormState extends State<CreateUserForm> {
     return null;
   }
 
-  void submit() {
+  Future<String> submit() async {
     if (this._formKey.currentState.validate()) {
       _formKey.currentState.save(); // Save our form now.
 
       var url = "https://cannonball-220004.appspot.com/newUser";
-      http.post(url, body: user.toJson())
-        .then((response) {
-          print("Response status: ${response.statusCode}");
-          print("Response body: ${response.body}");
-      });
+      Map map = {
+        'name': "janes"
+      };
+
+      HttpClient httpClient = new HttpClient();
+      HttpClientRequest request = await httpClient.postUrl(Uri.parse(url));
+      request.headers.set('content-type', 'application/json');
+      request.add(utf8.encode(json.encode(map)));
+      HttpClientResponse response = await request.close();
+
+      String reply = await response.transform(utf8.decoder).join();
+      httpClient.close();
+      print(reply);
+      return reply;
     }
   }
 
