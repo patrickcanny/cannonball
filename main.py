@@ -178,12 +178,16 @@ def checkInUser():
     LOGGER.info(newCheckIn)
     event = newCheckIn.get('name')
     targetEvent = mongo.db.events.find_one({'name': event})
+    LOGGER.debug("TargetEvent: {}".format(targetEvent))
     useremail = newCheckIn.get('email')
     targetUser = mongo.db.users.find_one({'email': useremail})
-    targetGroup = targetEvent.get('groupid')
+    targetGroup = targetEvent.get('groupID')
     groups = targetUser.get('groups')
+    LOGGER.debug("Groups: {}".format(groups))
+    LOGGER.debug("TargetGroup: {}".format(targetGroup))
 
     if targetGroup not in groups:
+        LOGGER.info("targetGroup not in user's current groups")
         myId = targetUser.get('_id')
         mongo.db.users.update_one({'_id': myId}, {'$push': {'groups': targetGroup}})
 
@@ -214,7 +218,7 @@ def getAllGroupsForUser():
     groupNames = []
     for x in groups:
         groupNames.append(x.get('name'))
-        
+
     return groupNames
 
 '''
