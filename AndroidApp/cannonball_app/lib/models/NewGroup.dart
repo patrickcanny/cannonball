@@ -1,18 +1,17 @@
 class NewGroup {
-  String creator;
-  List<String> users;
-  List<String> admins;
+  String email;
+  String name;
+
 
   NewGroup({
-    this.users,
-    this.admins,
-    this.creator
+    this.name,
+
+    this.email
   });
 
   Map<String, dynamic> toJson() =>
       {
-        'users': users,
-        'admins': admins,
-        'creator': creator
+        'name': name,
+        'email': email
       };
 }
