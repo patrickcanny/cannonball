@@ -1,8 +1,8 @@
-class Group {
+class GroupEvent {
   String name;
   String email;
 
-  Group({
+  GroupEvent({
     this.name,
     this.email
   });

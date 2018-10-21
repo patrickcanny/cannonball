@@ -3,11 +3,10 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:cannonball_app/models/Coordinates.dart';
-import 'package:cannonball_app/models/Group.dart';
-import 'package:cannonball_app/models/NewGroup.dart';
 import 'package:cannonball_app/models/UserCheckIn.dart';
 import 'package:cannonball_app/util/requests.dart';
 import 'package:cannonball_app/util/session_controller.dart';
+import 'package:cannonball_app/util/pop_up.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -130,58 +129,9 @@ class _HomePageState extends State<HomePage> {
     //if (!mounted) return;
   }
 
-  void createGroup(String creator) async
-  {
-    NewGroup groupToAdd = new NewGroup();
-    groupToAdd.creator = creator;
-    groupToAdd.admins = [];
-    groupToAdd.users = [];
-    Requests.POST(groupToAdd.toJson(), "/newGroup");
-  }
-
-
   void slackExport(String group) async {
       String query = "/exportToSlack?group="+group;
       Requests.POST(null, query);
-  }
-
-  Future<Null> _renderEventPopUp() async {
-    final textController = TextEditingController();
-
-    return showDialog<Null>(
-      context: context,
-      barrierDismissible: true, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Create Event'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                TextField(
-                  controller: textController,
-                  decoration: new InputDecoration(
-                      labelText: 'Event Name'
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('Create'),
-              onPressed: () {
-                Group group = new Group();
-                group.name = textController.text;
-                group.email = SessionController.currentUserId();
-
-                Requests.POST(group.toJson(), 'newGroup');
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override
@@ -246,24 +196,10 @@ class _HomePageState extends State<HomePage> {
                        
                      ),),
                    onTap:() {
-                      createGroup(SessionController.currentUserId());
+                      PopUp.renderPopUp(context, 'Create Group', 'Group Name', 'newGroup');
                    },
 
                  ),
-
-//                 ListTile(
-//                   title: new Text(
-//                     "Export to Slack",
-//                     style: TextStyle(
-//                       fontSize: 20.0,
-//                       fontWeight: FontWeight.w700,
-//
-//                     ),),
-//                   onTap:() {
-//                     slackExport('slackTestGroup');
-//                   },
-//
-//                 ),
 
         new Column(
       mainAxisSize: MainAxisSize.min,
@@ -294,7 +230,7 @@ class _HomePageState extends State<HomePage> {
                        padding: const EdgeInsets.all(8.0),
                        textColor: Colors.white,
                        color: Colors.blue,
-                       onPressed:(){ _renderEventPopUp(); },
+                       onPressed:(){ PopUp.renderPopUp(context, 'Create Event', 'Event Name', 'newEvent'); },
                        child: new Text("Create Event"),
 
                      ),
