@@ -29,12 +29,13 @@ tok = token['slack']
 LOGGER = app.logger
 LOGGER.info(tok)
 
-# SLACK API
-try:
-    slack_client = SlackClient(os.getenv('SLACK_KEY'))
-except:
-    slack_client = SlackClient(tok)
-
+#SLACK API
+# try:
+#     slack_client = SlackClient(os.getenv('SLACK_KEY'))
+# except:
+LOGGER.debug(SlackClient(tok))
+slack_client = SlackClient(tok)
+LOGGER.debug(slack_client.api_call("api.test"))
 
 
 '''@params'''
@@ -234,16 +235,18 @@ def slackExport():
             pass
 
     emails =()
+    calls = []
     for user in users:
         u = mongo.db.users.find_one({"_id": user})
         email = u.get('email')
         if email not in teamEmails:
             callstring = "users.admin.invite?email={}".format(email)
             LOGGER.info(callstring)
+            calls.append(callstring)
             slack_client.api_call(callstring)
 
 
-    return "invites sent"
+    return "Emails Sent to: {}".format(calls)
 
 '''
 @params
