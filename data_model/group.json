@@ -1,0 +1,14 @@
+{
+  "_id":"ObjectId('id')",
+  "name":"name",
+  "creator":"ObjectId('id')",
+  "admins":[
+    0: "ObjectId('id')"
+  ],
+  "events":[
+    0:"ObjectId('id')"
+  ],
+  "members":[
+    0:"ObjectId('id')"
+  ]
+}

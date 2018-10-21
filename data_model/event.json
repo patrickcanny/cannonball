@@ -1,0 +1,15 @@
+{
+  "_id": "ObjectId('someId')",
+  "name": "myName",
+  "email": "example@example.com",
+  "checkedInUsers":[
+    0: "ObjectID('someId2')"
+  ],
+  "group": "ObjectId('someId')",
+  "gps_location": {
+    "lat":"latitude",
+    "long":"longitude"
+  },
+  "gps_radius": 3,
+  "isActive":true
+}

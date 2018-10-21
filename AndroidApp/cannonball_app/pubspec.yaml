@@ -15,6 +15,15 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  validate:
+  json_annotation: ^0.2.3
+  google_maps_flutter:
+    git:
+      url: git://github.com/gerryhigh/plugins
+      path: packages/google_maps_flutter
+  android_intent: "^0.2.1"
+  location: ^1.4.1
+  geolocator: ^2.1.0
 
 
 
@@ -27,13 +36,6 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  google_maps_flutter:
-    git:
-      url: git://github.com/gerryhigh/plugins
-      path: packages/google_maps_flutter
-  android_intent: "^0.2.1"
-  location: ^1.4.1
-  geolocator: ^2.1.0
 
 
 
