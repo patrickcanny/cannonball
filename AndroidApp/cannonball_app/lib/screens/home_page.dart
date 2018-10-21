@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
-
+import 'package:cannonball_app/models/Coordinates.dart';
+import 'package:cannonball_app/util/requests.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+
 var apiKey = "AIzaSyAAFXiekUVvfsAe1miEFxau1t-XG1oL5yg";
 Map<String, double> _currentLocation;
 Future<Position> position =  Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+var events;
+
 
 class MapsDemo extends StatelessWidget {
   MapsDemo(this.mapWidget, this.controller);
@@ -17,6 +21,14 @@ class MapsDemo extends StatelessWidget {
   final Widget mapWidget;
   final GoogleMapController controller;
 
+  void retreiveEvents(double lat, double long) async {
+    Coordinates coords = new Coordinates();
+    coords.latitude = _currentLocation["latitude"];
+    coords.longitude = _currentLocation["longitude"];
+    events = json.decode(await(Requests.POST(coords.toJson(), "/getNearbyEvents")));
+  }
+
+  
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -28,6 +40,8 @@ class MapsDemo extends StatelessWidget {
           RaisedButton(
             child: const Text('Update Current Location'),
             onPressed: () {
+              
+              
               controller.animateCamera(CameraUpdate.newCameraPosition(
                  CameraPosition(
                   bearing: 270.0,
@@ -170,7 +184,7 @@ class _HomePageState extends State<HomePage> {
                   return Card(
                     child: new ExpansionTile(
                       title: new Text(
-                        "${userData[index]["first_name"]} ${userData[index]["last_name"]}",
+                        "${events[index]["name"]}",
                         style: TextStyle(
                           fontSize: 20.0,
                           fontWeight: FontWeight.w700,
