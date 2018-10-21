@@ -10,19 +10,17 @@ from bson.objectid import ObjectId
 from flask import Flask, render_template, request, flash, redirect, url_for, session, logging, jsonify
 from flask_pymongo import PyMongo
 from slackclient import SlackClient
+from dotenv import load_dotenv
 # END IMPORTS
 
-# HERE API
-here_appId = "yDIiTl1dh0pFhmMq7Ggf"
-here_appCode = "Lz4ozsXQflfSlfcFpG74jw"
-here_baseURL = "https://pos.api.here.com/positioning/v1/"
-# END HERE
-
+APP_ROOT = os.path.join(os.path.dirname(__file__),'..')
+dotenv_path = os.path.join(APP_ROOT, '.env')
+load_dotenv(dotenv_path)
 # Define App requirements
 app = Flask(__name__, static_folder="../static", template_folder="../static")
 
 # SLACK API
-slack_client = SlackClient("xoxp-460967073045-460768312130-461837855431-1d2fa2229b2ae01e5d78e7279be3a66b")
+slack_client = SlackClient(os.getenv('SLACK_KEY'))
 
 # CONFIG
 app.config["MONGO_URI"] = "mongodb://" + urllib.parse.quote("cannonball") + ":" + urllib.parse.quote("test") + "@cluster0-shard-00-00-pevs9.gcp.mongodb.net:27017,cluster0-shard-00-01-pevs9.gcp.mongodb.net:27017,cluster0-shard-00-02-pevs9.gcp.mongodb.net:27017/CannonballDB?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true"

@@ -19,6 +19,8 @@
  # [START runtime]
 runtime: python
 env: flex
+env_variables:
+  SLACK_KEY: 'xoxp-460967073045-460768312130-462207965094-a610421dd0e392966e6873b0aef70f7a'
 entrypoint: gunicorn -b :$PORT main:app
 
 runtime_config:
