@@ -21,7 +21,7 @@ class MapsDemo extends StatelessWidget {
   final Widget mapWidget;
   final GoogleMapController controller;
 
-  void retreiveEvents(double lat, double long) async {
+  void retreiveEvents() async {
     Coordinates coords = new Coordinates();
     coords.latitude = _currentLocation["latitude"];
     coords.longitude = _currentLocation["longitude"];
@@ -40,6 +40,7 @@ class MapsDemo extends StatelessWidget {
           RaisedButton(
             child: const Text('Update Current Location'),
             onPressed: () {
+              retreiveEvents();
               
               
               controller.animateCamera(CameraUpdate.newCameraPosition(
@@ -179,12 +180,12 @@ class _HomePageState extends State<HomePage> {
             new Container(
               height: 220.0,
               child: new ListView.builder(
-                itemCount: userData == null ? 0 : userData.length,
+                itemCount: events == null ? 0 : events.length,
                 itemBuilder: (BuildContext context, int index) {
                   return Card(
                     child: new ExpansionTile(
                       title: new Text(
-                        "${events[index]["name"]}",
+                        "${events[index]}",
                         style: TextStyle(
                           fontSize: 20.0,
                           fontWeight: FontWeight.w700,
