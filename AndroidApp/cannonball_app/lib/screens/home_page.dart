@@ -17,7 +17,7 @@ var apiKey = "AIzaSyAAFXiekUVvfsAe1miEFxau1t-XG1oL5yg";
 Map<String, double> _currentLocation;
 Future<Position> position =  Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
 var events;
-
+var groups;
 
 class MapsDemo extends StatelessWidget {
   MapsDemo(this.mapWidget, this.controller);
@@ -31,6 +31,7 @@ class MapsDemo extends StatelessWidget {
     coords.longitude = _currentLocation["longitude"];
     events = json.decode(await(Requests.POST(coords.toJson(), "/getNearbyEvents")));
   }
+
 
   
   
@@ -146,6 +147,12 @@ class _HomePageState extends State<HomePage> {
       Requests.POST(null, query);
   }
 
+  void retreiveGroups() async {
+    Map m = {"email": SessionController.currentUserId()};
+    groups = json.decode(await(Requests.POST(m, "/userGroups")));
+    print(groups);
+  }
+
   void addNumbers() {
     setState(() {
       print(position);
@@ -154,6 +161,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    retreiveGroups();
     List<Widget> widgets;
     if (_currentLocation == null) {
       widgets = new List();
@@ -185,6 +193,7 @@ class _HomePageState extends State<HomePage> {
           IconButton(
           icon: const Icon(Icons.my_location),
           onPressed: () {
+
             final location = LatLng(_currentLocation["latitude"], _currentLocation["longitude"]);
             mapController.markers.clear();
             mapController.addMarker(MarkerOptions(
@@ -199,17 +208,19 @@ class _HomePageState extends State<HomePage> {
       ],
         backgroundColor: Colors.green,
       ),
-    drawer: new Drawer( child: ListView(
+    drawer: new Drawer(
+      child: ListView(
+
         padding: EdgeInsets.zero,
         children: <Widget>[
-         UserAccountsDrawerHeader(accountName: new Text("Harrison Luo"),accountEmail: new Text("luo.harrison@yahoo.com"), /*currentAccountPicture: new Image.asset('varun'), */decoration: BoxDecoration(color: new Color.fromRGBO(36, 120, 65, 1.0),
+         UserAccountsDrawerHeader(accountEmail: new Text(SessionController.currentUserId()), /*currentAccountPicture: new Image.asset('varun'), */decoration: BoxDecoration(color: new Color.fromRGBO(36, 120, 65, 1.0),
          ),),
 
 
 
                  ListTile(
                    title: new Text(
-                     "Create Your Group",
+                     "Create A Group",
                      style: TextStyle(
                        fontSize: 20.0,
                        fontWeight: FontWeight.w700,
@@ -249,12 +260,12 @@ class _HomePageState extends State<HomePage> {
 
            height: 600.0,
            child: new ListView.builder(
-             itemCount: events == null ? 0 : events.length,
+             itemCount: groups == null ? 0 : groups.length,
              itemBuilder: (BuildContext context, int index) {
                return Card(
                  child: new ExpansionTile(
                    title: new Text(
-                     "${events[index]}",
+                     "${groups[index]}",
                      style: TextStyle(
                        fontSize: 20.0,
                        fontWeight: FontWeight.w700,
@@ -264,8 +275,8 @@ class _HomePageState extends State<HomePage> {
                        padding: const EdgeInsets.all(8.0),
                        textColor: Colors.white,
                        color: Colors.blue,
-                       onPressed:(){ checkIn(events[index], SessionController.currentUserId()); },
-                       child: new Text("Check in group"),
+                       onPressed:(){ checkIn(groups[index], SessionController.currentUserId()); },
+                       child: new Text("Create New Event"),
 
                      ),
                      new RaisedButton(
@@ -274,7 +285,7 @@ class _HomePageState extends State<HomePage> {
                        color: Colors.green,
                        child: new Text("Export Group to Slack"),
                         onPressed:() {
-                                slackExport('slackTestGroup');
+                                slackExport(groups[index]);
                                },
                      ),
                    ],
