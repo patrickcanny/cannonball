@@ -3,6 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:cannonball_app/models/Coordinates.dart';
+import 'package:cannonball_app/models/NewGroup.dart';
 import 'package:cannonball_app/models/UserCheckIn.dart';
 import 'package:cannonball_app/util/requests.dart';
 import 'package:cannonball_app/util/session_controller.dart';
@@ -35,7 +36,7 @@ class MapsDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(15.0),
+      padding: EdgeInsets.all(5.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
@@ -50,7 +51,7 @@ class MapsDemo extends StatelessWidget {
                  CameraPosition(
                   bearing: 270.0,
                   target: LatLng(_currentLocation["latitude"], _currentLocation["longitude"]),
-                  tilt: 30.0,
+                  tilt: 35.0,
                   zoom: 17.0,
                 ),
               ));
@@ -63,7 +64,7 @@ class MapsDemo extends StatelessWidget {
 }
 
 final GoogleMapOverlayController controller =
-GoogleMapOverlayController.fromSize(width: 300.0, height: 200.0);
+GoogleMapOverlayController.fromSize(width: 325.0, height: 280.0);
 final Widget mapWidget = GoogleMapOverlay(controller: controller);
 
 class HomePage extends StatefulWidget {
@@ -128,6 +129,19 @@ class _HomePageState extends State<HomePage> {
     //if (!mounted) return;
   }
 
+  void createGroup(String creator) async
+  {
+    NewGroup groupToAdd = new NewGroup();
+    groupToAdd.creator = creator;
+    groupToAdd.admins = [];
+    groupToAdd.users = [];
+    Requests.POST(groupToAdd.toJson(), "/newGroup");
+  }
+
+  void slackExport() async {
+    
+  }
+
   void addNumbers() {
     setState(() {
       print(position);
@@ -159,9 +173,12 @@ class _HomePageState extends State<HomePage> {
     final mapController = controller.mapController;
     return Scaffold(
       appBar: AppBar(
+
         title: Text("GPS Check In"),
         actions: <Widget>[
-        IconButton(
+
+
+          IconButton(
           icon: const Icon(Icons.my_location),
           onPressed: () {
             final location = LatLng(_currentLocation["latitude"], _currentLocation["longitude"]);
@@ -178,6 +195,83 @@ class _HomePageState extends State<HomePage> {
       ],
         backgroundColor: Colors.green,
       ),
+    drawer: new Drawer( child: ListView(
+        padding: EdgeInsets.zero,
+        children: <Widget>[
+         UserAccountsDrawerHeader(accountName: new Text("Harrison Luo"),accountEmail: new Text("luo.harrison@yahoo.com"), currentAccountPicture: new Image.asset('../assets/varun.jpg.jpg'), decoration: BoxDecoration(color: new Color.fromRGBO(36, 120, 65, 1.0),
+         ),),
+
+
+
+                 ListTile(
+                   title: new Text(
+                     "Create Your Group",
+                     style: TextStyle(
+                       fontSize: 20.0,
+                       fontWeight: FontWeight.w700,
+                       
+                     ),),
+                   onTap:() {
+                      createGroup(SessionController.currentUserId());
+                   },
+
+                 ),
+
+                 ListTile(
+                   title: new Text(
+                     "Export to Slack",
+                     style: TextStyle(
+                       fontSize: 20.0,
+                       fontWeight: FontWeight.w700,
+
+                     ),),
+                   onTap:() {
+                     createGroup();
+                   },
+
+                 ),
+
+
+
+
+
+
+
+        new Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            new Text("\nYour Groups", style: TextStyle(
+          fontSize: 20.0,
+          fontWeight: FontWeight.w700,
+        ),),
+          ],
+        ),
+         new Container(
+
+           height: 600.0,
+           child: new ListView.builder(
+             itemCount: events == null ? 0 : events.length,
+             itemBuilder: (BuildContext context, int index) {
+               return Card(
+                 child: new ListTile(
+                   title: new Text(
+                     "${events[index]}",
+                     style: TextStyle(
+                       fontSize: 20.0,
+                       fontWeight: FontWeight.w700,
+                     ),),
+
+
+                 ),
+               );
+             },
+           ),
+         ),
+      ],
+    ),
+    ),
+
       body: new Padding(
         padding: const EdgeInsets.all(20.0),
         child: new Column(

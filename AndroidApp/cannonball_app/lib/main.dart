@@ -9,9 +9,9 @@ class Cannonball extends StatelessWidget {
     return MaterialApp(
         title: 'Cannonball',
         home: Scaffold(
-          appBar: AppBar(
-            title: Text('Check In App'),
-          ),
+//          appBar: AppBar(
+//            title: Text('Check In App'),
+//          ),
           body: Center(
             child: SignInForm(),
           ),
