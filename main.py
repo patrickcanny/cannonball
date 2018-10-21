@@ -116,6 +116,7 @@ def insertNewEvent():
     groupEvents = group.get('events')
     if eid not in groupEvents:
         mongo.db.groups.update_one({'_id': ObjectId(gid)},{'$push':{'events':eid}})
+    newEvent.update_one({''})
     return dumps(newEvent)
 
 @app.route("/checkInUser", methods=['POST'])
@@ -199,6 +200,24 @@ def getNearbyEvents():
         if distance(float(curLat), float(x.get('latitude')), float(curLong), float(x.get('longitude'))) < 2 :
             nearbyEvents.append(x.get('name'))
     return dumps(nearbyEvents)
+
+@app.route("/pingAllMembers", methods = ['POST'])
+def getAllMembers():
+    app.logger.info('recieved')
+    groupinfo = request.get_json()  
+    groupName = groupinfo.get('name')
+    targetGroup = mongo.db.groups.find_one({"name": groupName})
+    groupMembers = targetGroup.get('users')
+    return dumps(groupMembers)
+
+@app.route("/closeEvent", methods = ['POST'])
+def closeEvent():
+    app.logger.info('recieved')
+    eventinfo = request.get_json()
+    eventName = eventinfo.get('name')
+    mongo.db.events.update_one({'name': eventName}, {'$set':{"Active": False}})
+    return 'success'
+
 
 
 
