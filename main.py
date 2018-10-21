@@ -199,6 +199,17 @@ def getNearbyEvents():
             nearbyEvents.append(x.get('name'))
     return dumps(nearbyEvents)
 
+@app.route("/pingAllMembers", methods = ['POST'])
+def getAllMembers():
+    app.logger.info('recieved')
+    groupinfo = request.get_json()  
+    groupName = groupinfo.get('name')
+    targetGroup = mongo.db.groups.find_one({"name": groupName})
+    groupMembers = targetGroup.get('users')
+    return dumps(groupMembers)
+
+
+
 
 
 
