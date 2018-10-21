@@ -53,6 +53,7 @@ class CreateUserFormState extends State<CreateUserForm> {
     final Size screenSize = MediaQuery.of(context).size;
 
     return new Scaffold(
+      resizeToAvoidBottomPadding: false,
       appBar: new AppBar(
         title: new Text('Create User'),
       ),

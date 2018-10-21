@@ -68,6 +68,7 @@ class SignInFormState extends State<SignInForm> {
     final Size screenSize = MediaQuery.of(context).size;
 
     return new Scaffold(
+      resizeToAvoidBottomPadding: false,
       appBar: new AppBar(
         automaticallyImplyLeading: false,
         title: new Text('Sign In'),
