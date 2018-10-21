@@ -3,6 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:cannonball_app/models/Coordinates.dart';
+import 'package:cannonball_app/models/UserCheckIn.dart';
 import 'package:cannonball_app/util/requests.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -28,6 +29,7 @@ class MapsDemo extends StatelessWidget {
     events = json.decode(await(Requests.POST(coords.toJson(), "/getNearbyEvents")));
   }
 
+  
   
   @override
   Widget build(BuildContext context) {
@@ -81,6 +83,13 @@ class _HomePageState extends State<HomePage> {
 
   Map data;
   List userData;
+
+  void checkIn(String name, String email) async {
+    UserCheckIn check = new UserCheckIn();
+    check.name = name;
+    check.email = email;
+    Requests.POST(check.toJson(), "/checkInUser");
+  }
 
   Future getData() async {
     http.Response response = await http.get(
@@ -195,8 +204,9 @@ class _HomePageState extends State<HomePage> {
                           padding: const EdgeInsets.all(8.0),
                           textColor: Colors.white,
                           color: Colors.blue,
-                          onPressed: addNumbers,
+                          onPressed:(){ checkIn(events[index], user.email) },
                           child: new Text("Check in to group"),
+                          
                         ),
                       ],
                     ),
