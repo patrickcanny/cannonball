@@ -4,7 +4,15 @@
 
 Cannonball is a Location-based check-in application that can automatically export event attendees to a Slack Team. 
 
+## Inspiration
 The idea behind our mobile application is to create the easiest platform for taking class or student organization attendance. Users can see events that are occuring in their area, and check in to those events easily. After the meeting is over, the organizer can send out an invitation to attendees, asking them to join a Slack channel.
+
+As organizers of club meetings and the like, we are always looking for easy ways to easily track attendance at our meetings, as well as a low stress way of adding them to our communication channels. This app was our proposed solution!
+
+## Challenges
+We came into this hackathon knowing that we wanted to rey and build a mobile application, but none of us had any experience in developing a great mobile application. Thus, we had to take some time to research some of our options and determine the best tools to use. We landed on Flutter since it looked like a pretty progressive framework, and we had thought it looked pretty interesting. That being said, learning a new development tool meant that we had a tougher time getting started.
+
+We also ran into a variety of integration challenges between the frontend and backend of our application. Since the Flask API was being developed somewhat independently of the Flutter frontend, we had to troubleshoot some bugs down the stretch
 
 We built this app using:
 * Flutter - Mobile app framework - [docs](https://flutter.io/)

@@ -18,19 +18,36 @@ dotenv_path = os.path.join(APP_ROOT, '.env')
 load_dotenv(dotenv_path)
 # Define App requirements
 app = Flask(__name__, static_folder="../static", template_folder="../static")
-# SLACK API
-slack_client = SlackClient(os.getenv('SLACK_KEY'))
 
 # CONFIG
 app.config["MONGO_URI"] = "mongodb://" + urllib.parse.quote("cannonball") + ":" + urllib.parse.quote("test") + "@cluster0-shard-00-00-pevs9.gcp.mongodb.net:27017,cluster0-shard-00-01-pevs9.gcp.mongodb.net:27017,cluster0-shard-00-02-pevs9.gcp.mongodb.net:27017/CannonballDB?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true"
 app.debug=True
 mongo = PyMongo(app)
-LOGGER = app.logger
 
+token = mongo.db.users.find_one({"slack":{"$exists":True}})
+tok = token['slack']
+LOGGER = app.logger
+LOGGER.info(tok)
+
+# SLACK API
+try:
+    slack_client = SlackClient(os.getenv('SLACK_KEY'))
+except:
+    slack_client = SlackClient(tok)
+
+
+
+'''@params'''
 @app.route("/")
 def index():
     return("<h1>Cannonball!</h1>")
 
+'''
+@params
+f_name: string
+l_name: string
+email: string
+'''
 @app.route("/authenticateUser", methods=['POST'])
 def authenticate():
     userInfo = request.get_json()
@@ -45,13 +62,20 @@ def authenticate():
     except:
         return {}
 
+'''
+@params
+'''
 @app.route("/getEvents", methods=['GET'])
 def events():
     events = mongo.db.events.find()
     LOGGER.info(events)
     return dumps(events)
 
-# {{URL}}/getUsersForEvent?event={event name}
+'''
+@params
+name: string as query param described below
+'''
+# {{URL}}/getUsersForEvent?name={event name}
 @app.route("/getUsersForEvent", methods = ['GET'])
 def usersByEvent():
     eventName = request.args.get('name')
@@ -69,6 +93,11 @@ def usersByEvent():
         i += 1
     return dumps(userDict)
 
+'''
+@params
+newUser: user-formatted JSON as body
+see 'data_model/user.json for details'
+'''
 @app.route("/newUser", methods=['POST'])
 def insertNewUser():
     try:
@@ -79,6 +108,11 @@ def insertNewUser():
     except:
         return "there was an error in creating a new user: {}".format(newUser)
 
+'''
+@params
+newGroup: group-formatted JSON as body
+
+'''
 @app.route("/newGroup", methods=['POST'])
 def insertNewGroup():
     newGroup = request.get_json()
@@ -108,6 +142,10 @@ def insertNewGroup():
     mongo.db.groups.insert(newGroup)
     return dumps(newGroup)
 
+'''
+@params
+Event-formatted JSON
+'''
 @app.route("/newEvent", methods=['POST'])
 def insertNewEvent():
     newEvent = request.get_json()
@@ -133,6 +171,11 @@ def insertNewEvent():
     newEvent.update_one({''})
     return dumps(newEvent)
 
+'''
+@params
+name: the name of an event
+email: some user email that is checking in
+'''
 @app.route("/checkInUser", methods=['POST'])
 def checkInUser():
     LOGGER.info('recieved')
@@ -162,6 +205,10 @@ def checkInUser():
         else:
             return "Looks like you're already checked in!"
 
+'''
+@params
+email: user email
+'''
 @app.route("/userGroups", methods=['POST'])
 def getAllGroupsForUser():
     LOGGER.info('recieved')
@@ -171,6 +218,10 @@ def getAllGroupsForUser():
     groups = targetUser.get('groups')
     return dumps(groups)
 
+'''
+@params
+group: some group name as a query param
+'''
 @app.route("/exportToSlack", methods=['POST'])
 def slackExport():
     groupName = request.args.get('group')
@@ -200,6 +251,10 @@ def slackExport():
 
     return "invites sent"
 
+'''
+@params
+location: a JSON with a latitude and longitude info
+'''
 @app.route("/getNearbyEvents", methods = ['POST'])
 def getNearbyEvents():
     LOGGER.info('recieved')
@@ -215,6 +270,10 @@ def getNearbyEvents():
             nearbyEvents.append(x.get('name'))
     return dumps(nearbyEvents)
 
+'''
+@params
+name: name of a group
+'''
 @app.route("/pingAllMembers", methods = ['POST'])
 def getAllMembers():
     LOGGER.info('recieved')
@@ -224,6 +283,10 @@ def getAllMembers():
     groupMembers = targetGroup.get('users')
     return dumps(groupMembers)
 
+'''
+@params
+name: name of the 3event you want to close
+'''
 @app.route("/closeEvent", methods = ['POST'])
 def closeEvent():
     LOGGER.info('recieved')
@@ -232,10 +295,11 @@ def closeEvent():
     mongo.db.events.update_one({'name': eventName}, {'$set':{"Active": False}})
     return 'success'
 
-
-
-
-
+'''
+@params
+lat1, lat2, long1, long2
+calculate distance helper function
+'''
 def distance(lat1, lat2, long1, long2):
     dlong = long2 - long1
     dlat = lat2 -lat1
