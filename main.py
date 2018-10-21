@@ -18,7 +18,6 @@ dotenv_path = os.path.join(APP_ROOT, '.env')
 load_dotenv(dotenv_path)
 # Define App requirements
 app = Flask(__name__, static_folder="../static", template_folder="../static")
-
 # SLACK API
 slack_client = SlackClient(os.getenv('SLACK_KEY'))
 
@@ -26,26 +25,41 @@ slack_client = SlackClient(os.getenv('SLACK_KEY'))
 app.config["MONGO_URI"] = "mongodb://" + urllib.parse.quote("cannonball") + ":" + urllib.parse.quote("test") + "@cluster0-shard-00-00-pevs9.gcp.mongodb.net:27017,cluster0-shard-00-01-pevs9.gcp.mongodb.net:27017,cluster0-shard-00-02-pevs9.gcp.mongodb.net:27017/CannonballDB?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true"
 app.debug=True
 mongo = PyMongo(app)
+LOGGER = app.logger
 
 @app.route("/")
 def index():
     return("<h1>Cannonball!</h1>")
 
+@app.route("/authenticateUser", methods=['POST'])
+def authenticate():
+    userInfo = request.get_json()
+    f_name = userInfo.get('f_name')
+    l_name = userInfo.get('l_name')
+    email = userInfo.get('email')
+
+    try:
+        user = mongo.db.users.find_one({'f_name':f_name},{'l_name':l_name, 'email':email})
+        LOGGER.info("Found User {}".format(user))
+        return dumps(user)
+    except:
+        return {}
+
 @app.route("/getEvents", methods=['GET'])
 def events():
     events = mongo.db.events.find()
-    app.logger.info(events)
+    LOGGER.info(events)
     return dumps(events)
 
 # {{URL}}/getUsersForEvent?event={event name}
 @app.route("/getUsersForEvent", methods = ['GET'])
 def usersByEvent():
     eventName = request.args.get('name')
-    app.logger.info(eventName)
+    LOGGER.info(eventName)
     event = mongo.db.events.find_one({'name': eventName})
-    app.logger.info(event)
+    LOGGER.info(event)
     users = event.get('checkedInUsers')
-    app.logger.info(users)
+    LOGGER.info(users)
 
     userDict = {}
     i = 0
@@ -59,7 +73,7 @@ def usersByEvent():
 def insertNewUser():
     try:
         newUser = request.get_json()
-        app.logger.info(newUser)
+        LOGGER.info(newUser)
         mongo.db.users.insert(newUser)
         return dumps(newUser)
     except:
@@ -68,7 +82,7 @@ def insertNewUser():
 @app.route("/newGroup", methods=['POST'])
 def insertNewGroup():
     newGroup = request.get_json()
-    app.logger.debug(newGroup)
+    LOGGER.debug(newGroup)
     newusers = []
     newadmins = []
     for user in newGroup.get('users'):
@@ -86,11 +100,11 @@ def insertNewGroup():
     obj = ObjectId(uid)
     newcreator = obj
 
-    app.logger.debug(newusers)
+    LOGGER.debug(newusers)
     newGroup['users'] = newusers
     newGroup['admins'] = newadmins
     newGroup['creator'] = newcreator
-    app.logger.info(newGroup)
+    LOGGER.info(newGroup)
     mongo.db.groups.insert(newGroup)
     return dumps(newGroup)
 
@@ -98,11 +112,11 @@ def insertNewGroup():
 def insertNewEvent():
     newEvent = request.get_json()
     name = newEvent.get('name')
-    app.logger.info(newEvent)
+    LOGGER.info(newEvent)
     gid = str(newEvent.get('groupid')['$oid'])
-    app.logger.info(gid)
+    LOGGER.info(gid)
     newEvent['groupid'] = ObjectId(gid)
-    app.logger.info(newEvent)
+    LOGGER.info(newEvent)
     mongo.db.events.insert(newEvent)
     try:
         event = mongo.db.events.find_one({'name': name})
@@ -121,9 +135,9 @@ def insertNewEvent():
 
 @app.route("/checkInUser", methods=['POST'])
 def checkInUser():
-    app.logger.info('recieved')
+    LOGGER.info('recieved')
     newCheckIn = request.get_json()
-    app.logger.info(newCheckIn)
+    LOGGER.info(newCheckIn)
     event = newCheckIn.get('name')
     targetEvent = mongo.db.events.find_one({'name': event})
     useremail = newCheckIn.get('email')
@@ -135,8 +149,8 @@ def checkInUser():
         myId = targetUser.get('_id')
         mongo.db.users.update_one({'_id': myId}, {'$push': {'groups': targetGroup}})
 
-    app.logger.info(targetUser)
-    app.logger.info(targetEvent)
+    LOGGER.info(targetUser)
+    LOGGER.info(targetEvent)
 
     userId = targetUser.get("_id")
     myId = targetEvent.get("_id")
@@ -150,7 +164,7 @@ def checkInUser():
 
 @app.route("/userGroups", methods=['POST'])
 def getAllGroupsForUser():
-    app.logger.info('recieved')
+    LOGGER.info('recieved')
     theUser = request.get_json()
     useremail = theUser.get('email')
     targetUser = mongo.db.users.find_one({'email': useremail})
@@ -164,11 +178,11 @@ def slackExport():
     users = group.get('users')
 
     team = slack_client.api_call("users.list")
-    app.logger.debug(team)
+    LOGGER.debug(team)
     teamEmails = ()
     for user in team:
         try:
-            app.logger.debug(user)
+            LOGGER.debug(user)
             email = user.get('profile').get('email')
             teamEmails.add(email)
         except:
@@ -180,7 +194,7 @@ def slackExport():
         email = u.get('email')
         if email not in teamEmails:
             callstring = "users.admin.invite?email={}".format(email)
-            app.logger.info(callstring)
+            LOGGER.info(callstring)
             slack_client.api_call(callstring)
 
 
@@ -188,12 +202,12 @@ def slackExport():
 
 @app.route("/getNearbyEvents", methods = ['POST'])
 def getNearbyEvents():
-    app.logger.info('recieved')
+    LOGGER.info('recieved')
     location = request.get_json()
     curLong = location.get('longitude')
     curLat = location.get('latitude')
-    app.logger.info(curLong)
-    app.logger.info(curLat)
+    LOGGER.info(curLong)
+    LOGGER.info(curLat)
     myEvents = mongo.db.events.find({})
     nearbyEvents = []
     for x in myEvents:
@@ -203,8 +217,8 @@ def getNearbyEvents():
 
 @app.route("/pingAllMembers", methods = ['POST'])
 def getAllMembers():
-    app.logger.info('recieved')
-    groupinfo = request.get_json()  
+    LOGGER.info('recieved')
+    groupinfo = request.get_json()
     groupName = groupinfo.get('name')
     targetGroup = mongo.db.groups.find_one({"name": groupName})
     groupMembers = targetGroup.get('users')
@@ -212,7 +226,7 @@ def getAllMembers():
 
 @app.route("/closeEvent", methods = ['POST'])
 def closeEvent():
-    app.logger.info('recieved')
+    LOGGER.info('recieved')
     eventinfo = request.get_json()
     eventName = eventinfo.get('name')
     mongo.db.events.update_one({'name': eventName}, {'$set':{"Active": False}})
@@ -234,7 +248,7 @@ def distance(lat1, lat2, long1, long2):
 # LAUNCH APP
 if __name__ == "__main__":
         port = int(os.environ.get("PORT", 5000))
-        app.logger.info("Getting Flask up and running...\n")
+        LOGGER.info("Getting Flask up and running...\n")
         if slack_client.api_call("api.test") is not None:
-            app.logger.info("Connected to Slack!")
+            LOGGER.info("Connected to Slack!")
         app.run(host = '127.0.0.1' , port = port)
