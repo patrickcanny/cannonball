@@ -6,7 +6,8 @@ import 'package:cannonball_app/models/Coordinates.dart';
 import 'package:cannonball_app/models/UserCheckIn.dart';
 import 'package:cannonball_app/util/requests.dart';
 import 'package:cannonball_app/util/session_controller.dart';
-import 'package:cannonball_app/util/pop_up.dart';
+import 'package:cannonball_app/views/event_pop_up.dart';
+import 'package:cannonball_app/views/group_pop_up.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -29,6 +30,11 @@ class MapsDemo extends StatelessWidget {
     coords.longitude = _currentLocation["longitude"];
     events = json.decode(await(Requests.POST(coords.toJson(), "/getNearbyEvents")));
   }
+  void retreiveGroups() async {
+    Map m = {"email": SessionController.currentUserId()};
+    groups = json.decode(await(Requests.POST(m, "/userGroups")));
+    print(groups);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +48,7 @@ class MapsDemo extends StatelessWidget {
             child: const Text('Update Current Location'),
             onPressed: () {
               retreiveEvents();
+              //retreiveGroups();
               controller.animateCamera(CameraUpdate.newCameraPosition(
                 CameraPosition(
                   bearing: 270.0,
@@ -73,6 +80,7 @@ class _HomePageState extends State<HomePage> {
   Location _location = new Location();
   bool _permission = false;
   String error;
+  bool _active = false;
 
   bool currentWidget = true;
 
@@ -129,15 +137,15 @@ class _HomePageState extends State<HomePage> {
     Requests.POST(null, query);
   }
 
-  void retreiveGroups() async {
-    Map m = {"email": SessionController.currentUserId()};
-    groups = json.decode(await(Requests.POST(m, "/userGroups")));
-    print(groups);
+  void _handleButtonTap(){
+    setState(() {
+      _active = !_active;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    retreiveGroups();
+   // retreiveGroups();
     List<Widget> widgets;
     if (_currentLocation == null) {
       widgets = new List();
@@ -198,7 +206,7 @@ class _HomePageState extends State<HomePage> {
 
               ),),
             onTap:() {
-              PopUp.renderPopUp(context, 'Create Group', 'Group Name', 'newGroup');
+              GroupPopUp.renderPopUp(context);
             },
 
           ),
@@ -217,12 +225,12 @@ class _HomePageState extends State<HomePage> {
 
             height: 600.0,
             child: new ListView.builder(
-              itemCount: events == null ? 0 : events.length,
+              itemCount: groups == null ? 0 : groups.length,
               itemBuilder: (BuildContext context, int index) {
                 return Card(
                   child: new ExpansionTile(
                     title: new Text(
-                      "${events[index]}",
+                      "${groups[index]}",
                       style: TextStyle(
                         fontSize: 20.0,
                         fontWeight: FontWeight.w700,
@@ -232,7 +240,7 @@ class _HomePageState extends State<HomePage> {
                         padding: const EdgeInsets.all(8.0),
                         textColor: Colors.white,
                         color: Colors.blue,
-                        onPressed:(){ PopUp.renderPopUp(context, 'Create Event', 'Event Name', 'newEvent'); },
+                        onPressed:(){ EventPopUp.renderPopUp(context, _currentLocation["latitude"].toString(), _currentLocation["longitude"].toString()); },
                         child: new Text("Create Event"),
 
                       ),
@@ -243,6 +251,7 @@ class _HomePageState extends State<HomePage> {
                        child: new Text("Export Group to Slack"),
                         onPressed:() {
                           slackExport(groups[index]);
+                          _handleButtonTap();
                         },
                       ),
                     ],
@@ -279,10 +288,11 @@ class _HomePageState extends State<HomePage> {
                       children: <Widget>[
                         new RaisedButton(
                           padding: const EdgeInsets.all(8.0),
-                          textColor: Colors.white,
+                          textColor: Colors.red,
                           color: Colors.blue,
                           onPressed:(){ checkIn(events[index], SessionController.currentUserId()); },
-                          child: new Text("Check in to group"),
+                          child: new Text( _active ? 'Check In' : 'Already Checked In',
+                            style: TextStyle(fontSize: 32.0, color: Colors.white),),
                         ),
                       ],
                     ),
