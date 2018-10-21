@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:validate/validate.dart';
 import 'package:cannonball_app/models/User.dart';
 import 'package:cannonball_app/util/requests.dart';
-import 'package:cannonball_app/screens/home_page.dart';
+import 'package:cannonball_app/screens/create_user_form.dart';
 
-class CreateUserForm extends StatefulWidget {
+class SignInForm extends StatefulWidget {
   @override
-  CreateUserFormState createState() {
-    return CreateUserFormState();
+  SignInFormState createState() {
+    return SignInFormState();
   }
 }
 
-class CreateUserFormState extends State<CreateUserForm> {
+class SignInFormState extends State<SignInForm> {
   final _formKey = GlobalKey<FormState>();
   User user = new User();
 
@@ -37,13 +37,16 @@ class CreateUserFormState extends State<CreateUserForm> {
   void submit() async {
     if (this._formKey.currentState.validate()) {
       _formKey.currentState.save(); // Save our form now.
-      Requests.POST(user.toJson(), "newUser");
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => HomePage()),
-      );
+      Requests.POST(user.toJson(), "authenticateUser");
     }
+  }
+
+  void newUser() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => CreateUserForm()),
+    );
   }
 
   @override
@@ -52,7 +55,7 @@ class CreateUserFormState extends State<CreateUserForm> {
 
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text('Create User'),
+        title: new Text('Sign In'),
       ),
       body: new Container(
           padding: new EdgeInsets.all(20.0),
@@ -88,15 +91,6 @@ class CreateUserFormState extends State<CreateUserForm> {
                       this.user.email = value;
                     }
                 ),
-                new TextFormField(
-                    keyboardType: TextInputType.phone,
-                    decoration: new InputDecoration(
-                        labelText: 'Phone Number'
-                    ),
-                    onSaved: (String value) {
-                      this.user.phoneNumber = value;
-                    }
-                ),
                 new Container(
                   width: screenSize.width,
                   child: new RaisedButton(
@@ -107,6 +101,22 @@ class CreateUserFormState extends State<CreateUserForm> {
                       ),
                     ),
                     onPressed: this.submit,
+                    color: Colors.green,
+                  ),
+                  margin: new EdgeInsets.only(
+                      top: 20.0
+                  ),
+                ),
+                new Container(
+                  width: screenSize.width,
+                  child: new RaisedButton(
+                    child: new Text(
+                      'Create New User',
+                      style: new TextStyle(
+                          color: Colors.white
+                      ),
+                    ),
+                    onPressed: this.newUser,
                     color: Colors.green,
                   ),
                   margin: new EdgeInsets.only(
