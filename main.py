@@ -288,7 +288,7 @@ def getNearbyEvents():
     myEvents = mongo.db.events.find({})
     nearbyEvents = []
     for x in myEvents:
-        if distance(float(curLat), float(x.get('latitude')), float(curLong), float(x.get('longitude'))) < 2 :
+        if distance(float(curLat), float(x.get('latitude')), float(curLong), float(x.get('longitude'))) >0 :
             nearbyEvents.append(x.get('name'))
     return dumps(nearbyEvents)
 
