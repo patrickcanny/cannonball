@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
 import 'package:cannonball_app/models/User.dart';
+import 'package:cannonball_app/util/requests.dart';
 
 class CreateUserForm extends StatefulWidget {
   @override
@@ -36,25 +37,11 @@ class CreateUserFormState extends State<CreateUserForm> {
     return null;
   }
 
-  Future<String> submit() async {
+  void submit() async {
     if (this._formKey.currentState.validate()) {
       _formKey.currentState.save(); // Save our form now.
-
-      var url = "https://cannonball-220004.appspot.com/newUser";
-      Map map = {
-        'name': "janes"
-      };
-
-      HttpClient httpClient = new HttpClient();
-      HttpClientRequest request = await httpClient.postUrl(Uri.parse(url));
-      request.headers.set('content-type', 'application/json');
-      request.add(utf8.encode(json.encode(map)));
-      HttpClientResponse response = await request.close();
-
-      String reply = await response.transform(utf8.decoder).join();
-      httpClient.close();
-      print(reply);
-      return reply;
+      
+      Requests.POST(user.toJson(), "newUser");
     }
   }
 
