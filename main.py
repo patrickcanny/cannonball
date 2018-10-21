@@ -95,15 +95,9 @@ def insertNewGroup():
         obj = ObjectId(uid)
         newadmins.append(obj)
 
-    creator = newGroup.get('creator')
-    uid = str(user['$oid'])
-    obj = ObjectId(uid)
-    newcreator = obj
-
     LOGGER.debug(newusers)
     newGroup['users'] = newusers
     newGroup['admins'] = newadmins
-    newGroup['creator'] = newcreator
     LOGGER.info(newGroup)
     mongo.db.groups.insert(newGroup)
     return dumps(newGroup)
