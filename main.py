@@ -211,7 +211,11 @@ def getAllGroupsForUser():
     useremail = theUser.get('email')
     targetUser = mongo.db.users.find_one({'email': useremail})
     groups = targetUser.get('groups')
-    return dumps(groups)
+    groupNames = []
+    for x in groups:
+        groupNames.append(x.get('name'))
+        
+    return groupNames
 
 '''
 @params

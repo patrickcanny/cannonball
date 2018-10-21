@@ -102,5 +102,16 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+<<<<<<< HEAD
+
+### AndroidStudio Patch ###
+
+!/gradle/wrapper/gradle-wrapper.jar
+
+### Flutter ###
+.flutter-plugins
+=======
 .env
 .yaml
+>>>>>>> master
+.xml
