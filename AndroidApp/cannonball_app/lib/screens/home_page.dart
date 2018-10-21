@@ -15,6 +15,7 @@ var apiKey = "AIzaSyAAFXiekUVvfsAe1miEFxau1t-XG1oL5yg";
 Map<String, double> _currentLocation;
 Future<Position> position =  Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
 var events;
+var groups;
 
 class MapsDemo extends StatelessWidget {
   MapsDemo(this.mapWidget, this.controller);
@@ -128,8 +129,15 @@ class _HomePageState extends State<HomePage> {
     Requests.POST(null, query);
   }
 
+  void retreiveGroups() async {
+    Map m = {"email": SessionController.currentUserId()};
+    groups = json.decode(await(Requests.POST(m, "/userGroups")));
+    print(groups);
+  }
+
   @override
   Widget build(BuildContext context) {
+    retreiveGroups();
     List<Widget> widgets;
     if (_currentLocation == null) {
       widgets = new List();
@@ -178,8 +186,8 @@ class _HomePageState extends State<HomePage> {
       drawer: new Drawer( child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
-          UserAccountsDrawerHeader(accountName: new Text("Harrison Luo"),accountEmail: new Text("luo.harrison@yahoo.com"), /*currentAccountPicture: new Image.asset('varun'), */decoration: BoxDecoration(color: new Color.fromRGBO(36, 120, 65, 1.0),
-          ),),
+          UserAccountsDrawerHeader(accountEmail: new Text(SessionController.currentUserId()), /*currentAccountPicture: new Image.asset('varun'), */decoration: BoxDecoration(color: new Color.fromRGBO(36, 120, 65, 1.0),
+         ),),
 
           ListTile(
             title: new Text(
@@ -229,12 +237,12 @@ class _HomePageState extends State<HomePage> {
 
                       ),
                       new RaisedButton(
-                        padding: const EdgeInsets.all(8.0),
-                        textColor: Colors.white,
-                        color: Colors.green,
-                        child: new Text("Export Group to Slack"),
+                       padding: const EdgeInsets.all(8.0),
+                       textColor: Colors.white,
+                       color: Colors.green,
+                       child: new Text("Export Group to Slack"),
                         onPressed:() {
-                          slackExport('slackTestGroup');
+                          slackExport(groups[index]);
                         },
                       ),
                     ],
@@ -246,7 +254,6 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       ),
-
       body: new Padding(
         padding: const EdgeInsets.all(20.0),
         child: new Column(
@@ -276,7 +283,6 @@ class _HomePageState extends State<HomePage> {
                           color: Colors.blue,
                           onPressed:(){ checkIn(events[index], SessionController.currentUserId()); },
                           child: new Text("Check in to group"),
-
                         ),
                       ],
                     ),
