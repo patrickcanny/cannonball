@@ -264,6 +264,12 @@
       </list>
     </option>
   </component>
+<<<<<<< HEAD
+  <component name="ProjectFrameBounds">
+    <option name="y" value="23" />
+    <option name="width" value="951" />
+    <option name="height" value="877" />
+=======
   <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="65" />
     <option name="y" value="25" />
@@ -275,6 +281,7 @@
     <ConfirmationsSetting value="1" id="Add" />
 =======
 >>>>>>> androidDev
+>>>>>>> fb6eedf2b61fad80c0fb6e362c25fd3dd4a44b0d
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">

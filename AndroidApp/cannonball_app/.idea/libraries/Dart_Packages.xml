@@ -1,4 +1,7 @@
 <component name="libraryTable">
+<<<<<<< HEAD
+  <library name="Dart Packages">
+=======
   <library name="Dart Packages" type="DartPackagesLibraryType">
     <properties>
       <option name="packageNameToDirsMap">
@@ -452,6 +455,7 @@
         </entry>
       </option>
     </properties>
+>>>>>>> fb6eedf2b61fad80c0fb6e362c25fd3dd4a44b0d
     <CLASSES>
       <root url="file://$USER_HOME$/flutter/.pub-cache/git/plugins-27eeb33cd8dba4663b7e909ae7728d0a70910e82/packages/google_maps_flutter/lib" />
       <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/analyzer-0.32.4/lib" />

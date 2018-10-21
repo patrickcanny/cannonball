@@ -114,3 +114,4 @@ venv.bak/
 .env
 .yaml
 >>>>>>> master
+.xml
