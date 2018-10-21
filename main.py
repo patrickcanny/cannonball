@@ -118,6 +118,7 @@ def insertNewEvent():
     groupEvents = group.get('events')
     if eid not in groupEvents:
         mongo.db.groups.update_one({'_id': ObjectId(gid)},{'$push':{'events':eid}})
+    newEvent.update_one({''})
     return dumps(newEvent)
 
 @app.route("/checkInUser", methods=['POST'])
@@ -211,6 +212,13 @@ def getAllMembers():
     groupMembers = targetGroup.get('users')
     return dumps(groupMembers)
 
+@app.route("/closeEvent", methods = ['POST'])
+def closeEvent():
+    app.logger.info('recieved')
+    eventinfo = request.get_json()
+    eventName = eventinfo.get('name')
+    mongo.db.events.update_one({'name': eventName}, {'$set':{"Active": False}})
+    return 'success'
 
 
 
