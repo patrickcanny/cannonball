@@ -120,15 +120,25 @@ def insertNewGroup():
     LOGGER.debug(newGroup)
     newusers = []
     newadmins = []
-    for user in newGroup.get('users'):
-        uid = str(user['$oid'])
-        obj = ObjectId(uid)
-        newusers.append(obj)
+    creatoremail = newGroup['email']
+    creator = mongo.db.users.find_one({'email':creatoremail})
+    uid = creator.get('_id')
+    newusers.append(uid)
 
-    for user in newGroup.get('admins'):
-        uid = str(user['$oid'])
-        obj = ObjectId(uid)
-        newadmins.append(obj)
+    if newGroup.get('users'):
+        for user in newGroup.get('users'):
+            try:
+                uid = str(user['$oid'])
+                obj = ObjectId(uid)
+                newusers.append(obj)
+            except:
+                pass
+
+    if newGroup.get('admins'):
+        for user in newGroup.get('admins'):
+            uid = str(user['$oid'])
+            obj = ObjectId(uid)
+            newadmins.append(obj)
 
     LOGGER.debug(newusers)
     newGroup['users'] = newusers
