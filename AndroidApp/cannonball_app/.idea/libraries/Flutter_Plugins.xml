@@ -1,8 +1,13 @@
 <component name="libraryTable">
   <library name="Flutter Plugins" type="FlutterPluginsLibraryType">
     <CLASSES>
+<<<<<<< HEAD
       <root url="file://C:/src/flutter/.pub-cache/hosted/pub.dartlang.org/google_sign_in-3.2.1" />
       <root url="file://C:/src/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_auth-0.6.2+1" />
+=======
+      <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/google_sign_in-3.2.1" />
+      <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_auth-0.6.2+1" />
+>>>>>>> android-user-sign-up
     </CLASSES>
     <JAVADOC />
     <SOURCES />
