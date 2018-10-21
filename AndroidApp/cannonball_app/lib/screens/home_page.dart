@@ -5,6 +5,7 @@ import 'package:location/location.dart';
 import 'package:cannonball_app/models/Coordinates.dart';
 import 'package:cannonball_app/models/UserCheckIn.dart';
 import 'package:cannonball_app/util/requests.dart';
+import 'package:cannonball_app/util/session_controller.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -204,7 +205,7 @@ class _HomePageState extends State<HomePage> {
                           padding: const EdgeInsets.all(8.0),
                           textColor: Colors.white,
                           color: Colors.blue,
-                          onPressed:(){ checkIn(events[index], user.email) },
+                          onPressed:(){ checkIn(events[index], SessionController.currentUserId()); },
                           child: new Text("Check in to group"),
                           
                         ),
