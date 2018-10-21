@@ -129,10 +129,8 @@ def insertNewGroup():
         obj = ObjectId(uid)
         newadmins.append(obj)
 
-    creator = newGroup.get('creator')
-    uid = str(user['$oid'])
-    obj = ObjectId(uid)
-    newcreator = obj
+    email = newGroup.get('creator')
+    newcreator = email
 
     LOGGER.debug(newusers)
     newGroup['users'] = newusers
